@@ -1,0 +1,69 @@
+# ============================================================
+#  Marsa Maroc – Full Stack Docker Compose
+#  React (Vite) + Node.js (Express) + MySQL 8.0
+# ============================================================
+
+services:
+
+  # ── Base de données MySQL ─────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: marsa_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: marsa_maroc_db
+      MYSQL_USER: marsa_user
+      MYSQL_PASSWORD: marsa_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marsa_network
+
+  # ── Backend Node.js ───────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: marsa_backend
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: marsa_user
+      MYSQL_PASSWORD: marsa_password
+      MYSQL_DATABASE: marsa_maroc_db
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - marsa_network
+
+  # ── Frontend React ────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: marsa_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - marsa_network
+
+volumes:
+  mysql_data:
+
+networks:
+  marsa_network:
+    driver: bridge
