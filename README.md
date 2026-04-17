@@ -1,4 +1,5 @@
 # STAGE_PFE_MARSA_MAROC
+<!-- Last automation trigger: 2026-04-17 14:19 -->
 
 ## 🚢 Optimisation du Stacking de Conteneurs via Intelligence Artificielle
 
