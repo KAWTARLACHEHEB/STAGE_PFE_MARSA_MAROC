@@ -1,9 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-marsa-orange: #FF8C00;
+  --color-marsa-navy: #002347;
+  --font-sans: "Inter", "system-ui", "sans-serif";
+}
+
+:root {
+  color-scheme: dark;
+}
 
 body {
   margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: #020617;
+  color: #cbd5e1;
+  font-family: var(--font-sans);
+}
+
+/* Animations Framer Motion Custom */
+.layout-grid {
+  display: grid;
+  gap: 1.5rem;
 }

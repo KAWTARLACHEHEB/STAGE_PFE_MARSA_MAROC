@@ -1,69 +1,50 @@
-# ============================================================
-#  Marsa Maroc – Full Stack Docker Compose
-#  React (Vite) + Node.js (Express) + MySQL 8.0
-# ============================================================
+version: '3.8'
 
 services:
-
-  # ── Base de données MySQL ─────────────────────────────────
+  # Base de donnees MySQL Marsa Maroc
   db:
     image: mysql:8.0
     container_name: marsa_db
-    restart: unless-stopped
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: marsa_maroc_db
-      MYSQL_USER: marsa_user
-      MYSQL_PASSWORD: marsa_password
+      MYSQL_ROOT_PASSWORD: Kawtar@123
     ports:
       - "3307:3306"
     volumes:
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
-      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - marsa_network
 
-  # ── Backend Node.js ───────────────────────────────────────
+  # Backend Python (FastAPI + IA)
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: app/Dockerfile
     container_name: marsa_backend
-    restart: unless-stopped
-    environment:
-      MYSQL_HOST: db
-      MYSQL_USER: marsa_user
-      MYSQL_PASSWORD: marsa_password
-      MYSQL_DATABASE: marsa_maroc_db
-      PORT: 5000
     ports:
-      - "5000:5000"
+      - "8000:8000"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=Kawtar@123
+      - MYSQL_DATABASE=marsa_maroc_db
     depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - marsa_network
+      - db
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
 
-  # ── Frontend React ────────────────────────────────────────
+  # Frontend React (Vite)
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     container_name: marsa_frontend
-    restart: unless-stopped
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
-    networks:
-      - marsa_network
 
 volumes:
   mysql_data:
-
-networks:
-  marsa_network:
-    driver: bridge
