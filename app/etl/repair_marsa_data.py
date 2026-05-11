@@ -33,18 +33,8 @@ def repair_marsa_pipeline(input_path, output_path):
             
             # Approche 1 : Niveau et Occurrences depuis les derniers chiffres
             niveau_raw = int(nums[-2]) if len(nums) >= 2 else 1
+            niveau_final = min(niveau_raw, 6)
             occurrences = str(int(nums[-1])) if len(nums) >= 1 else "0"
-            
-            # --- REGLE APPROCHE 1 (DEMANDEE) ---
-            # Si le niveau est entre 1 et 4 -> PLEIN
-            # Si le niveau est 5 ou 6 (ou plus) -> VIDE
-            if niveau_raw >= 5:
-                niveau_final = min(niveau_raw, 6) # Plafonnement a 6
-                type_zone = "VIDE"
-            else:
-                niveau_final = max(1, niveau_raw)
-                type_zone = "PLEIN"
-
             cellule = parts[3] if (len(parts) > 3 and parts[3] != "") else "ZONE_C"
             
             final_data.append({
@@ -53,15 +43,14 @@ def repair_marsa_pipeline(input_path, output_path):
                 "TRAVEE": travee,
                 "CELLULE": cellule,
                 "NIVEAU": niveau_final,
-                "OCCURRENCES": occurrences,
-                "TYPE_ZONE": type_zone
+                "OCCURRENCES": occurrences
             })
             
             if niveau_raw != niveau_final:
                 repaired_count += 1
 
         # EXPORT
-        headers = ["TERMINAL", "BLOC", "TRAVEE", "CELLULE", "NIVEAU", "OCCURRENCES", "TYPE_ZONE"]
+        headers = ["TERMINAL", "BLOC", "TRAVEE", "CELLULE", "NIVEAU", "OCCURRENCES"]
         with open(output_path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()

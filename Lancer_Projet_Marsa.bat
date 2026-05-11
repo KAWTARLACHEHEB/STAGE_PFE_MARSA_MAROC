@@ -13,7 +13,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo [2/3] Demarrage du Serveur Backend (FastAPI)...
-start "Backend API" cmd /k "cd backend && uvicorn main:app --reload --port 8000"
+start "Backend API" cmd /k "cd app && uvicorn main:app --reload --port 8000"
 
 echo [3/3] Demarrage de l'Interface Utilisateur (React)...
 start "Frontend UI" cmd /k "cd frontend && npm run dev"

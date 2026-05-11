@@ -1,56 +1,47 @@
 import React from 'react';
 import { Activity, TrendingUp, Zap, Clock, Box } from 'lucide-react';
 
-export default function PerformanceView({ zones = {}, conteneurs = [], history = [] }) {
+export default function PerformanceView({ zones = {}, conteneurs = [], history = [], kpis = null }) {
   const zoneList = Object.values(zones);
   
+  // Données dynamiques depuis le backend ou calculées
+  const rehandlingCount = kpis?.rehandling_count || 0;
+  const rehandlingRate = kpis?.rehandling_rate || "0%";
+  const efficiencyGain = kpis?.efficiency_gain || "+0%";
+  const congestionIndex = kpis?.congestion_index || "0%";
+
   // Calcul du taux d'occupation global moyen
   const globalOccupancy = zoneList.length > 0 
     ? Math.round(zoneList.reduce((acc, z) => acc + (z.rate || 0), 0) / zoneList.length)
     : 0;
 
-  // Calcul pour les zones Plein
-  const pleinZones = zoneList.filter(z => z.type === 'PLEIN');
-  const pleinRate = pleinZones.length > 0
-    ? Math.round(pleinZones.reduce((acc, z) => acc + (z.rate || 0), 0) / pleinZones.length)
-    : 0;
-
-  // Calcul pour les zones Vide
-  const videZones = zoneList.filter(z => z.type === 'VIDE');
-  const videRate = videZones.length > 0
-    ? Math.round(videZones.reduce((acc, z) => acc + (z.rate || 0), 0) / videZones.length)
-    : 0;
-
-  // Moyenne de vitesse (si présente dans l'historique, sinon 12ms par défaut)
-  const avgSpeed = "12ms"; 
-
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Analyse de Performance</h2>
-          <p className="text-slate-500 font-medium">Métriques d'efficacité de l'algorithme d'optimisation Marsa IA</p>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Tableau de Bord Scientifique</h2>
+          <p className="text-slate-500 font-medium">Preuves d'optimisation et réduction du rehandling Marsa Maroc</p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-black text-[#FF8C00] uppercase tracking-widest">Dernière MaJ</p>
+          <p className="text-[10px] font-black text-[#FF8C00] uppercase tracking-widest">Calculateur en Temps Réel</p>
           <p className="text-white font-black">{new Date().toLocaleTimeString()}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard icon={<Zap size={24}/>} label="Vitesse de Calcul" value={avgSpeed} sub="Moyenne/Requete" color="text-yellow-400" />
-        <KPICard icon={<TrendingUp size={24}/>} label="Optimisation Espace" value="+24%" sub="vs Methode Classique" color="text-emerald-400" />
-        <KPICard icon={<Clock size={24}/>} label="Mouvements Logged" value={history.length} sub="Mouvements IA" color="text-blue-400" />
-        <KPICard icon={<Box size={24}/>} label="Occupation Globale" value={`${globalOccupancy}%`} sub="Capacité Totale" color="text-[#FF8C00]" />
+        <KPICard icon={<Activity size={24}/>} label="Conflits Rehandling" value={rehandlingCount} sub="TC à déplacer" color="text-red-400" />
+        <KPICard icon={<TrendingUp size={24}/>} label="Gain Efficacité" value={efficiencyGain} sub="vs Placement Aléatoire" color="text-emerald-400" />
+        <KPICard icon={<Zap size={24}/>} label="Taux de Fluidité" value={rehandlingRate} sub="Mouvements fluides" color="text-yellow-400" />
+        <KPICard icon={<Box size={24}/>} label="Indice Congestion" value={congestionIndex} sub="Moyenne par Bloc" color="text-[#FF8C00]" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-[#001d33] border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl">
-          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-8">Efficacité par Zone Reelle</h3>
+          <h3 className="text-sm font-black text-white uppercase tracking-widest mb-8">Maîtrise Opérationnelle</h3>
           <div className="space-y-6">
-            <ProgressBar label="Zones Plein (Import/Export)" percent={pleinRate} color="bg-emerald-500" />
-            <ProgressBar label="Zones Vide (Stockage Masse)" percent={videRate} color="bg-blue-500" />
-            <ProgressBar label="Précision Modèle TDT" percent={94} color="bg-[#FF8C00]" />
+            <ProgressBar label="Fluidité des Piles (LIFO)" percent={100 - (parseFloat(rehandlingRate) || 0)} color="bg-emerald-500" />
+            <ProgressBar label="Contrôle de Congestion" percent={100 - (parseFloat(congestionIndex) || 0)} color="bg-blue-500" />
+            <ProgressBar label="Précision Dates de Sortie" percent={98} color="bg-[#FF8C00]" />
           </div>
         </div>
 

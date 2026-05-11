@@ -1,0 +1,11 @@
+node_modules/
+.git/
+__pycache__/
+data/raw/
+dist/
+build/
+*.log
+*.tmp
+.ipynb_checkpoints/
+venv/
+.env
